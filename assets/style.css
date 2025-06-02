@@ -1,0 +1,115 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.folder-container {
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.folder-view {
+  list-style-type: none;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.folder-view ul {
+  list-style-type: none;
+  padding-right: 25px;
+  margin-top: 5px;
+}
+
+.folder-view li {
+  margin: 10px 0;
+  position: relative;
+}
+
+.folder-view .folder {
+  cursor: pointer;
+  font-weight: bold;
+  color: #0d6efd;
+  display: block;
+  padding: 5px 10px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.folder-view .folder:hover {
+  background-color: #f0f0f0;
+}
+
+.folder-view .file {
+  color: #212529;
+  padding: 5px 10px;
+  display: block;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.folder-view .file:hover {
+  background-color: #f0f0f0;
+}
+
+/* Admin Panel Styles */
+.admin-card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-bottom: 20px;
+}
+
+.admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-card .card-header {
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 10px 10px 0 0;
+  font-weight: bold;
+}
+
+.btn-action {
+  margin-right: 5px;
+}
+
+/* Form Styles */
+.form-container {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+/* Alert Messages */
+.alert {
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+/* RTL specific adjustments */
+.dropdown-menu {
+  text-align: right;
+}
+
+.form-check {
+  padding-right: 1.5em;
+  padding-left: 0;
+}
+
+.form-check .form-check-input {
+  float: right;
+  margin-right: -1.5em;
+  margin-left: 0;
+}

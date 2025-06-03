@@ -178,17 +178,42 @@ class News
   // function of reading news by category is ok
   public function readByCategory($category_id)
   {
-    $query = "SELECT n.id, n.name, n.content, n.created_at, n.updated_at
+    try {
+      // First check if the tables exist
+      $this->checkRequiredTables();
+
+      $query = "SELECT DISTINCT n.*
                 FROM " . $this->table_name . " n
-                JOIN " . $this->category_relation_table . " nc ON n.id = nc.news_id
+                INNER JOIN news_category nc ON n.id = nc.news_id
                 WHERE nc.category_id = ?
                 ORDER BY n.created_at DESC";
 
-    $stmt = $this->conn->prepare($query);
-    $stmt->bindParam(1, $category_id);
-    $stmt->execute();
+      $stmt = $this->conn->prepare($query);
+      $stmt->bindParam(1, $category_id);
+      $stmt->execute();
+      return $stmt;
+    } catch (PDOException $e) {
+      // Log error and return empty result set
+      error_log("Error reading news by category: " . $e->getMessage());
+      return $this->getEmptyResultSet();
+    }
+  }
 
-    return $stmt;
+  private function checkRequiredTables()
+  {
+    $tables = ['news', 'news_category'];
+    foreach ($tables as $table) {
+      $query = "SHOW TABLES LIKE '$table'";
+      $result = $this->conn->query($query);
+      if ($result->rowCount() == 0) {
+        throw new Exception("Required table '$table' does not exist");
+      }
+    }
+  }
+
+  private function getEmptyResultSet()
+  {
+    return $this->conn->query("SELECT * FROM " . $this->table_name . " WHERE 1=0");
   }
 
   // function of reading newa by category is ok
@@ -245,6 +270,19 @@ class News
     $stmt->execute();
 
     return $stmt;
+  }
+
+
+
+
+  public function countByCategory($category_id)
+  {
+    $query = "SELECT COUNT(*) as count FROM " . $this->table_name . " WHERE category_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $category_id);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row['count'];
   }
 }
 // إضافة هذه الدالة في ملف models/News.php

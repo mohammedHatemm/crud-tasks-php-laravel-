@@ -1,129 +1,121 @@
 <?php
-
+session_start();
 require_once 'config/database.php';
 require_once 'models/Category.php';
 require_once 'models/News.php';
 
-if (session_status() == PHP_SESSION_NONE) {
-  session_start();
-}
-
+// التحقق من تسجيل الدخول
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../login/login.php?error=" . urlencode("يجب تسجيل الدخول للوصول إلى هذه الصفحة"));
+  header("Location: login/login.php");
   exit();
 }
-
 
 $database = new Database();
 $db = $database->getConnection();
 
-
 $category = new Category($db);
+$news = new News($db);
 
+// الحصول على الفئة المحددة من الـ URL
+$selected_category = isset($_GET['category']) ? $_GET['category'] : null;
+
+$categories = $category->readCategoryHierarchy();
 
 include_once 'includes/header.php';
 ?>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="card mb-4">
-      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">فئات الأخبار</h2>
-        <div class="dropdown">
-          <button class="btn btn-light dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            اختر الفئة
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoryDropdown">
-            <?php
-            function displayCategoryDropdown($category, $parent_id = null, $level = 0)
-            {
-              if ($parent_id === null) {
-                $stmt = $category->readRootCategories();
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">فئات الأخبار</h2>
+          <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown">
+              <?php
+              if ($selected_category) {
+                $category->id = $selected_category;
+                $cat_info = $category->readOne();
+                echo htmlspecialchars($cat_info['name']);
               } else {
-                $category->id = $parent_id;
-                $stmt = $category->readChildren();
+                echo 'كل الفئات';
               }
-
-              if ($stmt->rowCount() > 0) {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                  $category->id = $row['id'];
-                  $children = $category->readChildren();
-
-
-
-                  $has_children = $children->rowCount() > 0;
-
-
+              ?>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="index.php">كل الفئات</a></li>
+              <?php
+              function displayCategories($categories, $level = 0)
+              {
+                foreach ($categories as $cat) {
                   $padding = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level);
+                  $class = isset($cat['children']) ? 'fw-bold parent-category' : '';
 
-                  if ($has_children) {
-                    echo '<li>';
+                  echo '<li><a class="dropdown-item ' . $class . '" href="index.php?category=' . $cat['id'] . '">'
+                    . $padding . htmlspecialchars($cat['name']) . '</a></li>';
 
-                    echo '<a class="dropdown-item  fw-bold " href="index.php?id='  . $row['id'] . '">'
-                      . $padding . htmlspecialchars($row['name']) . '</a>';
-                    echo '<li><hr class="dropdown-divider"></li>';
-                    displayCategoryDropdown($category, $row['id'], $level + 1);
-                    echo '</li>';
-                  } else {
-                    echo '<li><a class="dropdown-item" href="index.php?id='  . $row['id'] . '">'
-                      . $padding  . htmlspecialchars($row['name']) .       '</a></li>';
+                  if (isset($cat['children'])) {
+                    displayCategories($cat['children'], $level + 1);
                   }
                 }
               }
-            }
 
-            displayCategoryDropdown($category);
+              displayCategories($categories);
+              ?>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+            <?php
+            try {
+              if ($selected_category) {
+                // التحقق من وجود الفئة أولاً
+                $category->id = $selected_category;
+                $cat_info = $category->readOne();
+
+                if (!$cat_info) {
+                  throw new Exception("الفئة غير موجودة");
+                }
+
+                $stmt = $news->readByCategory($selected_category);
+              } else {
+                $stmt = $news->read();
+              }
+
+              if ($stmt->rowCount() > 0) {
+                // عرض عناصر الأخبار
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                  echo '<div class="col-md-4 mb-4">';
+                  echo '<div class="card h-100">';
+                  echo '<div class="card-header">' . htmlspecialchars($row['name']) . '</div>';
+                  echo '<div class="card-body">';
+                  echo '<p class="card-text">' . substr(htmlspecialchars($row['content']), 0, 150) . '...</p>';
+                  echo '</div>';
+                  echo '<div class="card-footer">';
+                  echo '<a href="view_news.php?id=' . $row['id'] . '" class="btn btn-primary">قراءة المزيد</a>';
+                  echo '</div>';
+                  echo '</div>';
+                  echo '</div>';
+                }
+              } else {
+                if ($selected_category) {
+                  echo '<div class="alert alert-info">لا توجد أخبار في هذه الفئة</div>';
+                } else {
+                  echo '<div class="alert alert-info">لا توجد أخبار متاحة</div>';
+                }
+              }
+            } catch (Exception $e) {
+              echo '<div class="alert alert-warning">خطأ في عرض الأخبار: ' . $e->getMessage() . '</div>';
+              error_log($e->getMessage());
+            }
             ?>
-          </ul>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-header bg-info text-white">
-        <h2 class="mb-0 text-center">أحدث الأخبار</h2>
-      </div>
-      <div class="card-body">
-        <?php
-
-        $news = new News($db);
-
-
-        $stmt = $news->read();
-
-        if ($stmt->rowCount() > 0) {
-          echo '<div class="row">';
-
-          while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo '<div class="col-md-4 mb-4">';
-            echo '<div class="card h-100">';
-            echo '<div class="card-header">' . htmlspecialchars($row['name']) . '</div>';
-            echo '<div class="card-body">';
-            echo '<p>' . substr(htmlspecialchars($row['content']), 0, 150) . '...</p>';
-            echo '</div>';
-            echo '<div class="card-footer">';
-            echo '<a href="news.php?id=' . $row['id'] . '" class="btn btn-primary btn-sm">قراءة المزيد</a>';
-            echo '</div>';
-            echo '</div>';
-            echo '</div>';
-          }
-
-          echo '</div>';
-        } else {
-          echo '<div class="alert alert-info">لا توجد أخبار حالياً.</div>';
-        }
-        ?>
-      </div>
-    </div>
-  </div>
-</div>
-
-<?php
-
-include_once 'includes/footer.php';
-?>
+<?php include_once 'includes/footer.php'; ?>

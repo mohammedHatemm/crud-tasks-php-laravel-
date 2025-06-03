@@ -39,31 +39,11 @@ class Category
 
   public function readOne()
   {
-    $query = "SELECT c.id, c.name, c.description, c.parent_id,
-                  p.name as parent_name, c.created_at, c.updated_at
-                FROM " . $this->table_name . " c
-                LEFT JOIN " . $this->table_name . " p
-                ON c.parent_id = p.id
-                WHERE c.id = ?
-                LIMIT 0,1";
-
+    $query = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
     $stmt = $this->conn->prepare($query);
     $stmt->bindParam(1, $this->id);
     $stmt->execute();
-
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($row) {
-      $this->id = $row['id'];
-      $this->name = $row['name'];
-      $this->description = $row['description'];
-      $this->parent_id = $row['parent_id'];
-      $this->created_at = $row['created_at'];
-      $this->updated_at = $row['updated_at'];
-      return true;
-    }
-
-    return false;
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
   // ok
@@ -164,10 +144,18 @@ class Category
 
   public function readChildren()
   {
-    $query = "SELECT id, name, description, parent_id, created_at, updated_at
-                FROM " . $this->table_name . "
-                WHERE parent_id = ?
-                ORDER BY name";
+    $query = "SELECT
+                c.id,
+                c.name,
+                c.description,
+                c.parent_id,
+                c.created_at,
+                c.updated_at,
+                (SELECT COUNT(*) FROM " . $this->table_name . " sub
+                 WHERE sub.parent_id = c.id) as has_children
+              FROM " . $this->table_name . " c
+              WHERE c.parent_id = ?
+              ORDER BY c.name";
 
     $stmt = $this->conn->prepare($query);
     $stmt->bindParam(1, $this->id);
@@ -179,14 +167,60 @@ class Category
 
   public function readRootCategories()
   {
-    $query = "SELECT id, name, description, parent_id, created_at, updated_at
-                FROM " . $this->table_name . "
-                WHERE parent_id IS NULL
-                ORDER BY name";
+    $query = "SELECT
+                c.id,
+                c.name,
+                c.description,
+                c.parent_id,
+                c.created_at,
+                c.updated_at,
+                (SELECT COUNT(*) FROM " . $this->table_name . " sub
+                 WHERE sub.parent_id = c.id) as has_children
+              FROM " . $this->table_name . " c
+              WHERE c.parent_id IS NULL
+              ORDER BY c.name";
 
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
 
     return $stmt;
+  }
+
+  public function readCategoryHierarchy()
+  {
+    $query = "SELECT
+                c.id,
+                c.name,
+                c.description,
+                c.parent_id,
+                (SELECT COUNT(*) FROM " . $this->table_name . " sub
+                 WHERE sub.parent_id = c.id) as has_children
+              FROM " . $this->table_name . " c
+              ORDER BY c.parent_id IS NULL DESC, c.name ASC";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+
+    $categories = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      $categories[] = $row;
+    }
+
+    return $this->buildTree($categories);
+  }
+
+  private function buildTree(array $elements, $parentId = null)
+  {
+    $branch = array();
+    foreach ($elements as $element) {
+      if ($element['parent_id'] == $parentId) {
+        $children = $this->buildTree($elements, $element['id']);
+        if ($children) {
+          $element['children'] = $children;
+        }
+        $branch[] = $element;
+      }
+    }
+    return $branch;
   }
 }

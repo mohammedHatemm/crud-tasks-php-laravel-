@@ -160,8 +160,3 @@ if (isset($_SESSION['message'])) {
     </form>
   </div>
 </div>
-
-<?php
-// Include footer
-include_once '../../includes/footer.php';
-?>

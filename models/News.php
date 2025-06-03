@@ -11,6 +11,7 @@ class News
   public $name;
   public $content;
   public $categories = array();
+  public $user_id;
   public $created_at;
   public $updated_at;
 
@@ -38,7 +39,7 @@ class News
 
   public function readOne()
   {
-    $query = "SELECT n.id, n.name, n.content, n.created_at, n.updated_at
+    $query = "SELECT n.id, n.name, n.content, n.created_at, n.updated_at, n.user_id
                 FROM " . $this->table_name . " n
                 WHERE n.id = ?
                 LIMIT 0,1";
@@ -55,7 +56,7 @@ class News
       $this->content = $row['content'];
       $this->created_at = $row['created_at'];
       $this->updated_at = $row['updated_at'];
-
+      $this->user_id = $row['user_id'];
 
       $this->categories = $this->getNewsCategories();
 
@@ -76,28 +77,24 @@ class News
     try {
 
       $query = "INSERT INTO " . $this->table_name . "
-                    (name, content)
-                    VALUES (?, ?)";
+                    (name, content, user_id)
+                    VALUES (?, ?, ?)";
 
       $stmt = $this->conn->prepare($query);
-
 
       $this->name = htmlspecialchars(strip_tags($this->name));
       $this->content = htmlspecialchars(strip_tags($this->content));
 
-
       $stmt->bindParam(1, $this->name);
       $stmt->bindParam(2, $this->content);
-
+      $stmt->bindParam(3, $this->user_id);
 
       $stmt->execute();
       $this->id = $this->conn->lastInsertId();
 
-
       if (!empty($this->categories)) {
         $this->updateNewsCategories();
       }
-
 
       $this->conn->commit();
       return true;
@@ -236,4 +233,18 @@ class News
 
     return true;
   }
+  public function readByUser()
+  {
+    $query = "SELECT n.id, n.name, n.content, n.created_at, n.updated_at
+              FROM " . $this->table_name . " n
+              WHERE n.user_id = ?
+              ORDER BY n.created_at DESC";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $this->user_id);
+    $stmt->execute();
+
+    return $stmt;
+  }
 }
+// إضافة هذه الدالة في ملف models/News.php

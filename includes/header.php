@@ -1,5 +1,15 @@
 <?php
 $base_url = "http://localhost/";
+
+// بدء الجلسة إذا لم تكن قد بدأت بالفعل
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// التحقق مما إذا كان المستخدم مسجل الدخول
+$is_logged_in = isset($_SESSION['user_id']);
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+$user_id = $is_logged_in ? $_SESSION['user_id'] : null;
 ?>
 
 
@@ -61,12 +71,36 @@ $base_url = "http://localhost/";
               <li class="nav-item">
                 <a class="nav-link text-white" href="<?php echo $base_url; ?>/index.php">الرئيسية</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link text-white" href="<?php echo $base_url ?>/admin/categories/index.php">إدارة الفئات</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-white" href="<?php echo $base_url ?>/admin/news/index.php">إدارة الأخبار</a>
-              </li>
+
+              <?php if ($is_logged_in): ?>
+                <?php if ($is_admin): ?>
+                  <!-- روابط المشرف (Admin) -->
+                  <li class="nav-item">
+                    <a class="nav-link text-white" href="<?php echo $base_url ?>/admin/categories/index.php">إدارة الفئات</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link text-white" href="<?php echo $base_url ?>/admin/news/index.php">إدارة الأخبار</a>
+                  </li>
+                <?php else: ?>
+                  <!-- روابط المستخدم العادي (User) -->
+                  <li class="nav-item">
+                    <a class="nav-link text-white" href="<?php echo $base_url ?>/admin/news/index.php">أخباري</a>
+                  </li>
+                <?php endif; ?>
+
+                <!-- رابط تسجيل الخروج لجميع المستخدمين المسجلين -->
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="<?php echo $base_url ?>/auth/logout.php">تسجيل الخروج</a>
+                </li>
+              <?php else: ?>
+                <!-- روابط للزوار غير المسجلين -->
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="<?php echo $base_url ?>/login/login.php">تسجيل الدخول</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="<?php echo $base_url ?>/register/register.php">إنشاء حساب</a>
+                </li>
+              <?php endif; ?>
             </ul>
           </nav>
         </div>

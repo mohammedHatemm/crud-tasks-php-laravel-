@@ -4,6 +4,15 @@ require_once 'config/database.php';
 require_once 'models/Category.php';
 require_once 'models/News.php';
 
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+  header("Location: ../../login/login.php?error=" . urlencode("يجب تسجيل الدخول للوصول إلى هذه الصفحة"));
+  exit();
+}
+
 
 $database = new Database();
 $db = $database->getConnection();

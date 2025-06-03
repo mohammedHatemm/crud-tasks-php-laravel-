@@ -3,6 +3,9 @@
 require_once '../../config/database.php';
 require_once '../../models/News.php';
 require_once '../../models/Category.php';
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
 
 // Get database connection
 $database = new Database();
@@ -17,6 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Set news property values
   $news->name = $_POST['name'];
   $news->content = $_POST['content'];
+  $news->user_id = $_SESSION['user_id']; // إضافة معرف المستخدم
 
   // Set categories if selected
   if (isset($_POST['categories']) && is_array($_POST['categories'])) {

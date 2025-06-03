@@ -4,22 +4,64 @@ require_once '../../config/database.php';
 require_once '../../models/News.php';
 require_once '../../models/Category.php';
 
+// بدء الجلسة إذا لم تكن قد بدأت بالفعل
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// التحقق من تسجيل الدخول
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../login/login.php?error=" . urlencode("يجب تسجيل الدخول للوصول إلى هذه الصفحة"));
+    exit();
+}
 
 $database = new Database();
 $db = $database->getConnection();
 
-
 $news = new News($db);
 
+// تحديد ما إذا كان المستخدم مشرفًا أم مستخدمًا عاديًا
+$is_admin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
+$user_id = $_SESSION['user_id'];
 
+// معالجة حذف الخبر
+if (isset($_GET['delete']) && !empty($_GET['delete'])) {
+    $news->id = $_GET['delete'];
 
+    // التحقق من أن المستخدم العادي يمكنه فقط حذف أخباره
+    if (!$is_admin) {
+        // التحقق من أن الخبر ينتمي للمستخدم الحالي
+        $stmt = $news->readOne();
+        if ($news->user_id != $user_id) {
+            $_SESSION['message'] = "ليس لديك صلاحية لحذف هذا الخبر.";
+            $_SESSION['message_type'] = "danger";
+            header("Location: index.php");
+            exit;
+        }
+    }
+
+    if ($news->delete()) {
+        $_SESSION['message'] = "تم حذف الخبر بنجاح.";
+        $_SESSION['message_type'] = "success";
+    } else {
+        $_SESSION['message'] = "فشل في حذف الخبر.";
+        $_SESSION['message_type'] = "danger";
+    }
+    header("Location: index.php");
+    exit;
+}
+
+// إذا كان المستخدم عاديًا، قم بتعيين معرف المستخدم للبحث عن أخباره فقط
+if (!$is_admin) {
+    $news->user_id = $user_id;
+}
 
 include_once '../../includes/header.php';
 ?>
 
 <div class="row mb-4">
   <div class="col-md-6">
-    <h2>إدارة الأخبار</h2>
+    <h2><?php echo $is_admin ? "إدارة الأخبار" : "أخباري"; ?></h2>
   </div>
   <div class="col-md-6 text-end">
     <a href="create.php" class="btn btn-primary">
@@ -32,7 +74,7 @@ include_once '../../includes/header.php';
 
 <div class="card">
   <div class="card-header bg-primary text-white">
-    <h3 class="mb-0">قائمة الأخبار</h3>
+    <h3 class="mb-0"><?php echo $is_admin ? "قائمة الأخبار" : "قائمة أخباري"; ?></h3>
   </div>
   <div class="card-body">
     <div class="table-responsive">
@@ -48,8 +90,8 @@ include_once '../../includes/header.php';
         </thead>
         <tbody>
           <?php
-          // Read all news
-          $stmt = $news->read();
+          // قراءة الأخبار (جميع الأخبار للمشرف، أو أخبار المستخدم فقط للمستخدم العادي)
+          $stmt = $is_admin ? $news->read() : $news->readByUser();
 
           if ($stmt->rowCount() > 0) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -75,6 +117,7 @@ include_once '../../includes/header.php';
   </div>
 </div>
 
+<?php if ($is_admin): ?>
 <div class="card mt-4">
   <div class="card-header bg-info text-white">
     <h3 class="mb-0">عرض الأخبار حسب الفئات</h3>
@@ -143,6 +186,7 @@ include_once '../../includes/header.php';
     </div>
   </div>
 </div>
+<?php endif; ?>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

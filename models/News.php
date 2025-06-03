@@ -66,24 +66,23 @@ class News
     return false;
   }
 
-
   // function of creating news is ok
 
   public function create()
   {
-
     $this->conn->beginTransaction();
 
     try {
-
       $query = "INSERT INTO " . $this->table_name . "
-                    (name, content, user_id)
-                    VALUES (?, ?, ?)";
+                 (name, content, user_id)
+                 VALUES (?, ?, ?)";
 
       $stmt = $this->conn->prepare($query);
 
-      $this->name = htmlspecialchars(strip_tags($this->name));
-      $this->content = htmlspecialchars(strip_tags($this->content));
+      // Add null checks before sanitization
+      $this->name = htmlspecialchars(strip_tags($this->name ?? ''));
+      $this->content = htmlspecialchars(strip_tags($this->content ?? ''));
+      $this->user_id = (int)($this->user_id ?? 0);
 
       $stmt->bindParam(1, $this->name);
       $stmt->bindParam(2, $this->content);
@@ -99,7 +98,6 @@ class News
       $this->conn->commit();
       return true;
     } catch (Exception $e) {
-
       $this->conn->rollBack();
       return false;
     }
@@ -108,38 +106,31 @@ class News
 
   public function update()
   {
-
     $this->conn->beginTransaction();
 
     try {
-
       $query = "UPDATE " . $this->table_name . "
-                    SET name = ?, content = ?
-                    WHERE id = ?";
+                 SET name = ?, content = ?
+                 WHERE id = ?";
 
       $stmt = $this->conn->prepare($query);
 
-
-      $this->name = htmlspecialchars(strip_tags($this->name));
-      $this->content = htmlspecialchars(strip_tags($this->content));
-      $this->id = htmlspecialchars(strip_tags($this->id));
-
+      // Add null checks before sanitization
+      $this->name = htmlspecialchars(strip_tags($this->name ?? ''));
+      $this->content = htmlspecialchars(strip_tags($this->content ?? ''));
+      $this->id = (int)($this->id ?? 0);
 
       $stmt->bindParam(1, $this->name);
       $stmt->bindParam(2, $this->content);
       $stmt->bindParam(3, $this->id);
 
-
       $stmt->execute();
 
-
       $this->updateNewsCategories();
-
 
       $this->conn->commit();
       return true;
     } catch (Exception $e) {
-
       $this->conn->rollBack();
       return false;
     }
@@ -210,6 +201,7 @@ class News
       }
     }
   }
+
 
   private function getEmptyResultSet()
   {

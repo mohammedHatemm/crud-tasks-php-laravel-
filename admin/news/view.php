@@ -1,30 +1,31 @@
 <?php
-
+// Include database and object files
 require_once '../../config/database.php';
 require_once '../../models/News.php';
 require_once '../../models/Category.php';
 
-
+// Get database connection
 $database = new Database();
 $db = $database->getConnection();
 
-
+// Initialize objects
 $news = new News($db);
 $category = new Category($db);
 
+// Get ID from URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-
+// If no ID passed
 if ($id <= 0) {
   header("Location: index.php");
   exit;
 }
 
-
+// Set news ID and read details
 $news->id = $id;
 $news_exists = $news->readOne();
 
-
+// If news doesn't exist
 if (!$news_exists) {
   $_SESSION['message'] = "الخبر غير موجود.";
   $_SESSION['message_type'] = "danger";
@@ -32,7 +33,7 @@ if (!$news_exists) {
   exit;
 }
 
-
+// Include header
 include_once '../../includes/header.php';
 ?>
 

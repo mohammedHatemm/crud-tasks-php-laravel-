@@ -43,7 +43,19 @@ class Category
     $stmt = $this->conn->prepare($query);
     $stmt->bindParam(1, $this->id);
     $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+      // تعيين القيم مع قيم افتراضية في حالة كانت null
+      $this->name = $row['name'] ?? '';
+      $this->description = $row['description'] ?? '';
+      $this->parent_id = $row['parent_id'] ?? null;
+      $this->created_at = $row['created_at'] ?? '';
+      $this->updated_at = $row['updated_at'] ?? '';
+      return true;
+    }
+    return false;
   }
 
   // ok

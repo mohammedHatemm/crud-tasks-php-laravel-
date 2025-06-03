@@ -36,7 +36,7 @@ include_once 'includes/header.php';
               if ($selected_category) {
                 $category->id = $selected_category;
                 $cat_info = $category->readOne();
-                echo htmlspecialchars($cat_info['name']);
+                echo htmlspecialchars($cat_info['name'] ?? 'فئة غير موجودة');
               } else {
                 echo 'كل الفئات';
               }
@@ -94,7 +94,7 @@ include_once 'includes/header.php';
                   echo '<p class="card-text">' . substr(htmlspecialchars($row['content']), 0, 150) . '...</p>';
                   echo '</div>';
                   echo '<div class="card-footer">';
-                  echo '<a href="view_news.php?id=' . $row['id'] . '" class="btn btn-primary">قراءة المزيد</a>';
+                  echo '<a href="admin/news/view.php?id=' . $row['id'] . '" class="btn btn-primary">قراءة المزيد</a>';
                   echo '</div>';
                   echo '</div>';
                   echo '</div>';

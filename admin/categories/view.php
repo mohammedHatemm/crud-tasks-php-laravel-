@@ -67,11 +67,11 @@ include_once '../../includes/header.php';
         <table class="table table-bordered">
           <tr>
             <th style="width: 150px;">الاسم</th>
-            <td><?php echo htmlspecialchars($category->name); ?></td>
+            <td><?php echo htmlspecialchars($category->name ?? ''); ?></td>
           </tr>
           <tr>
             <th>الوصف</th>
-            <td><?php echo htmlspecialchars($category->description); ?></td>
+            <td><?php echo htmlspecialchars($category->description ?? ''); ?></td>
           </tr>
           <tr>
             <th>الفئة الأم</th>
@@ -80,8 +80,12 @@ include_once '../../includes/header.php';
               if ($category->parent_id) {
                 $parent = new Category($db);
                 $parent->id = $category->parent_id;
-                $parent->readOne();
-                echo '<a href="view.php?id=' . $parent->id . '">' . htmlspecialchars($parent->name) . '</a>';
+                if ($parent->readOne()) {
+                  echo '<a href="view.php?id=' . $parent->id . '">'
+                    . htmlspecialchars($parent->name ?? '') . '</a>';
+                } else {
+                  echo 'لا يوجد';
+                }
               } else {
                 echo 'لا يوجد (فئة رئيسية)';
               }
@@ -90,11 +94,11 @@ include_once '../../includes/header.php';
           </tr>
           <tr>
             <th>تاريخ الإنشاء</th>
-            <td><?php echo date('Y-m-d H:i', strtotime($category->created_at)); ?></td>
+            <td><?php echo $category->created_at ? date('Y-m-d H:i', strtotime($category->created_at)) : ''; ?></td>
           </tr>
           <tr>
             <th>آخر تحديث</th>
-            <td><?php echo date('Y-m-d H:i', strtotime($category->updated_at)); ?></td>
+            <td><?php echo $category->updated_at ? date('Y-m-d H:i', strtotime($category->updated_at)) : ''; ?></td>
           </tr>
         </table>
       </div>

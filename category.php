@@ -34,6 +34,8 @@ if (!$category_exists) {
 include_once 'includes/header.php';
 ?>
 
+
+
 <div class="row mb-4">
   <div class="col-md-12">
     <nav aria-label="breadcrumb">

@@ -2,36 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\News;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
-        $news = News::with('category')->latest()->paginate(10);
+        $news = News::with('categories')->get();
         return view('admin.news.index', compact('news'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
+    public function create()
     {
-        //
         $categories = Category::all();
         return view('admin.news.create', compact('categories'));
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -53,33 +41,18 @@ class NewsController extends Controller
             ->with('success', 'تم إنشاء الخبر بنجاح');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(News $news)
     {
-        //
-        return view('admin.news.show', compact('news'));
+        return view('admin.news.view', compact('news'));
     }
-    /**
-     * Show the form for editing the specified resource.
-     */
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(News $news)
     {
-        //
         $categories = Category::all();
         $selectedCategories = $news->categories->pluck('id')->toArray();
         return view('admin.news.update', compact('news', 'categories', 'selectedCategories'));
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, News $news)
     {
         $request->validate([
@@ -91,7 +64,7 @@ class NewsController extends Controller
 
         $news->update([
             'name' => $request->name,
-            'content' => $request->content,
+            'content' => $request->content
         ]);
 
         $news->categories()->sync($request->categories);
@@ -100,17 +73,14 @@ class NewsController extends Controller
             ->with('success', 'تم تحديث الخبر بنجاح');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(News $news)
     {
-        //
         $news->delete();
+
         return redirect()->route('news.index')
             ->with('success', 'تم حذف الخبر بنجاح');
     }
+
     public function home(Request $request)
     {
         $category = $request->query('category');

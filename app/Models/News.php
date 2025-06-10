@@ -2,31 +2,40 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class News extends Model
 {
-    //
-    protected $fillable = [
-        'title',
-        'content',
-        'user_id'
+    use HasFactory;
 
-    ];
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $fillable = ['name', 'content', 'user_id'];
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'news_category');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function scopeFilterByCategory($query, $categoryId)
     {
         if ($categoryId) {
             return $query->whereHas('categories', function ($q) use ($categoryId) {
                 $q->where('categories.id', $categoryId);
             });
+        }
+        return $query;
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        if ($search) {
+            return $query->where('name', 'like', "%{$search}%")
+                ->orWhere('content', 'like', "%{$search}%");
         }
         return $query;
     }

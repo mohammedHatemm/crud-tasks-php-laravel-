@@ -1,0 +1,30 @@
+/* تنسيقات لعناصر التصفية */
+.active-filter {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #4f46e5 !important; /* indigo-600 */
+}
+
+.dark .active-filter {
+    color: #818cf8 !important; /* indigo-400 */
+}
+
+/* تنسيقات للتأثيرات عند تحميل المحتوى */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* تنسيقات للأزرار */
+#clear-filters {
+    display: inline-flex;
+    align-items: center;
+}
+
+#clear-filters:before {
+    content: "×";
+    margin-left: 0.25rem;
+    font-size: 1.25rem;
+    line-height: 1;
+}

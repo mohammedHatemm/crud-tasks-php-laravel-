@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->foreignId('parent-id')->refrences('id')->on('categories')->onDelete('cascade');
+            $table->foreignId('parent_id')->nullable()->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

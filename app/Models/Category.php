@@ -21,8 +21,8 @@ class Category extends Model
     {
         return $this->belongsToMany(News::class, 'news_category');
     }
-    public function getCategoryHierarchy()
+    public static function getCategoryHierarchy()
     {
-        return $this->with('children.childern')->whileNull('parent_id')->get();
+        return self::with('children.children')->whereNull('parent_id')->get();
     }
 }

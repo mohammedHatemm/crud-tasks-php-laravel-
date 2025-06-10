@@ -54,6 +54,7 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         //
+        $category->load(['parent.parent.parent.parent', 'children', 'news']);
         return view('admin.categories.view', compact('category'));
     }
 

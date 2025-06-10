@@ -17,14 +17,34 @@
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold mb-2">{{ $category->name }}</h1>
 
-                        @if ($category->parent)
+                        {{-- @if ($category->parent)
                         <div class="mb-4">
                             <span class="text-sm text-gray-500 dark:text-gray-400">التصنيف الأب:</span>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 mr-1">
                                 {{ $category->parent->name }}
                             </span>
                         </div>
-                        @endif
+                        @endif --}}
+                        @if ($category->parent)
+<div class="mb-4">
+    <span class="text-sm text-gray-500 dark:text-gray-400">مسار التصنيف:</span>
+    <div class="flex items-center flex-wrap gap-1 mt-1">
+        @foreach ($category->getAncestors() as $ancestor)
+        <a href="{{ route('admin.categories.show', $ancestor) }}"
+           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-700 transition">
+            {{ $ancestor->name }}
+        </a>
+        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+        @endforeach
+
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+            {{ $category->name }} (الحالي)
+        </span>
+    </div>
+</div>
+@endif
 
                         @if ($category->description)
                         <div class="mb-6">

@@ -25,4 +25,33 @@ class Category extends Model
     {
         return self::with('children.children')->whereNull('parent_id')->get();
     }
+
+
+
+
+
+    //
+
+
+    public function getAncestors()
+    {
+        $ancestors = collect();
+        $current = $this;
+
+        while ($current->parent) {
+            $current = $current->parent;
+            $ancestors->prepend($current);
+        }
+
+        return $ancestors;
+    }
+
+    public function getFullPath($separator = ' > ')
+    {
+        if ($this->parent) {
+            return $this->parent->getFullPath($separator) . $separator . $this->name;
+        }
+
+        return $this->name;
+    }
 }

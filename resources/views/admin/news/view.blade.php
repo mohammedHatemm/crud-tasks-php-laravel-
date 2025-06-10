@@ -35,19 +35,24 @@
                         </div>
                     </div>
 
-                    <div class="flex space-x-4 rtl:space-x-reverse mt-6">
-                        <a href="{{ route('news.edit', $news) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 focus:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                            {{ __('تعديل') }}
-                        </a>
 
-                        <form action="{{ route('news.destroy', $news) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="return confirm('هل أنت متأكد من حذف هذا الخبر؟')">
-                                {{ __('حذف') }}
-                            </button>
-                        </form>
-                    </div>
+
+                    @if (Auth::check() && (Auth::user()->id === $news->user_id || Auth::user()->role === 'admin'))
+<div class="flex space-x-4 rtl:space-x-reverse mt-6">
+    <a href="{{ route('news.edit', $news) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 focus:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+        {{ __('تعديل') }}
+    </a>
+
+    <form action="{{ route('news.destroy', $news) }}" method="POST" class="inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="return confirm('هل أنت متأكد من حذف هذا الخبر؟')">
+            {{ __('حذف') }}
+        </button>
+    </form>
+</div>
+@endif
+
                 </div>
             </div>
         </div>

@@ -45,6 +45,8 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900 dark:text-gray-100">{{ $item->created_at->format('Y-m-d') }}</td>
                                         <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium">
+
+                                            @if(Auth::check()&&(Auth::user()->id ===$item->user_id || Auth::user()->role ==='admin')  )
                                             <div class="flex space-x-2 rtl:space-x-reverse">
                                                 <a href="{{ route('news.show', $item) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600 ml-2">عرض</a>
                                                 <a href="{{ route('news.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-600 ml-2">تعديل</a>
@@ -54,6 +56,7 @@
                                                     <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-600" onclick="return confirm('هل أنت متأكد من حذف هذا الخبر؟')">حذف</button>
                                                 </form>
                                             </div>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

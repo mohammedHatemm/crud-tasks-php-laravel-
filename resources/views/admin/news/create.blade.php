@@ -33,14 +33,12 @@
 
                         <!-- Categories -->
                         <div class="mb-4">
-                            <x-input-label :value="__('التصنيفات')" />
-                            <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                @foreach ($categories as $category)
-                                <div class="flex items-center">
-                                    <input id="category-{{ $category->id }}" name="categories[]" type="checkbox" value="{{ $category->id }}" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" {{ in_array($category->id, old('categories', [])) ? 'checked' : '' }}>
-                                    <label for="category-{{ $category->id }}" class="mr-2 block text-sm font-medium text-gray-700 dark:text-gray-300">{{ $category->name }}</label>
+                            <x-input-label :value="__('التصنيفات')" class="mb-2" />
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-4">
+                                <div class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                    اختر التصنيفات المناسبة للخبر
                                 </div>
-                                @endforeach
+                                @include('partials._news_category_checkbox_item', ['categories' => $categories, 'selectedCategories' => old('categories', [])])
                             </div>
                             <x-input-error :messages="$errors->get('categories')" class="mt-2" />
                         </div>

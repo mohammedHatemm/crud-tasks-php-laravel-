@@ -33,12 +33,17 @@
 
                             <div class="mb-4">
                                 <x-input-label for="parent_id" :value="__('التصنيف الأب')" />
-                                <select id="parent_id" name="parent_id" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                    <option value="">-- بدون تصنيف أب --</option>
-                                    @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="mt-1 space-y-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-md shadow-sm p-3 max-h-60 overflow-y-auto">
+                                    <div>
+                                        <input type="radio" id="parent_category_none" name="parent_id" value="" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" {{ old('parent_id') == '' ? 'checked' : '' }}>
+                                        <label for="parent_category_none" class="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">-- بدون تصنيف أب --</label>
+                                    </div>
+                                    <ul class="space-y-2">
+                                        @foreach ($categories as $category)
+                                            @include('partials._category_select_item', ['category' => $category, 'selectedCategory' => old('parent_id')])
+                                        @endforeach
+                                    </ul>
+                                </div>
                                 <x-input-error :messages="$errors->get('parent_id')" class="mt-2" />
                             </div>
 
@@ -109,5 +114,21 @@
             const modal = document.getElementById('categoryModal');
             modal.classList.toggle('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButtons = document.querySelectorAll('.toggle-category-select');
+
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const childrenContainer = this.closest('li').querySelector('.category-children-select');
+                    const folderArrowIcon = this.querySelector('.folder-arrow-icon');
+
+                    if (childrenContainer) {
+                        childrenContainer.classList.toggle('hidden');
+                        folderArrowIcon.classList.toggle('rotate-90');
+                    }
+                });
+            });
+        });
     </script>
 </x-app-layout>

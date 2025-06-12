@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Log;
+use App\Models\News;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,5 +23,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        Log::info('AppServiceProvider booted!');
     }
 }

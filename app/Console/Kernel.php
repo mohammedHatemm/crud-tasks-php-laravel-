@@ -10,9 +10,9 @@ class Kernel extends ConsoleKernel
 {
   protected function schedule(Schedule $schedule): void
   {
-    $schedule->call(function () {
-      Log::info('Schedule ran at: ' . now());
-    })->everyMinute();
+    // $schedule->call(function () {
+    //   Log::info('Schedule ran at: ' . now());
+    // })->everyMinute();
   }
 
   protected function commands(): void

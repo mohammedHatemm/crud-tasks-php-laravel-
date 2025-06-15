@@ -4,8 +4,12 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CategoryController;
+
+
 use App\Models\Category;
 use App\Models\News;
+use App\Models\User;
+use App\Notifications\NewsNotification;
 use Illuminate\Support\Facades\Mail;
 
 Route::get('/', [NewsController::class, 'home'])->name('news.home');
@@ -33,6 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::get('/news/filter', [NewsController::class, 'filter'])->name('news.filter');
 Route::get('/news/{news}/view', [NewsController::class, 'show'])->name('news.view');
+
+// example of sending an email notification
+
+Route::post('/notifications/{id}/mark-as-read', function ($id) {
+    auth()->user()->notifications()->findOrFail($id)->markAsRead();
+    return response()->json(['success' => true]);
+})->middleware('auth')->name('notifications.markAsRead');
 
 
 

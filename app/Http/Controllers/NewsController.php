@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\News;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewsNotification;
 
 class NewsController extends Controller
 {
@@ -34,6 +36,11 @@ class NewsController extends Controller
             'content' => $request->content,
             'user_id' => auth()->id()
         ]);
+        // $news = News::create($validated);
+        User::all()
+            ->each(function ($user) use ($news) {
+                $user->notify(new NewsNotification($news));
+            });
 
         $news->categories()->attach($request->categories);
 

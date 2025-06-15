@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewCategoryNotification;
+use Illuminate\Support\Facades\Notification;
 
 class CategoryController extends Controller
 {
@@ -44,7 +47,12 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
-        Category::create($request->all());
+        $category = Category::create($request->all());
+        // Notify all users about the new category
+
+        User::all()->each(function ($user) use ($category) {
+            $user->notify(new NewCategoryNotification($category));
+        });
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
     }
 

@@ -26,6 +26,56 @@
                         {{ __('الصفحة الرئيسية') }}
                     </x-nav-link>
                 </div>
+{{-- dddd --}}
+@if (Auth::check())
+<div class="relative" x-data="{ open: false }">
+    <button @click="open = !open" class="flex items-center my-5 py-1 px-1 rounded-md hover:bg-gray-100">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
+    </path>
+</svg>
+        {{-- <span class="ml-1">الإشعارات</span> --}}
+        @if(auth()->user()->unreadNotifications->count() > 0)
+            <span class="bg-red-500 text-white rounded-full px-2 ml-2 text-sm">
+                {{ auth()->user()->unreadNotifications->count() }}
+            </span>
+        @endif
+    </button>
+
+    <div x-show="open" @click.away="open = false"
+         class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 max-h-96 overflow-y-auto">
+        @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notification)
+            <div class="px-4 py-3 border-b hover:bg-gray-50 {{ $notification->read_at ? 'opacity-60' : 'bg-blue-50' }}">
+                <div class="text-sm">
+                    {{ $notification->data['message'] ?? 'إشعار جديد' }}
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                    {{ $notification->created_at->diffForHumans() }}
+                </div>
+                @if(!$notification->read_at)
+                    <button class="text-xs text-blue-600 hover:text-blue-800 mt-1"
+                            onclick="markAsRead('{{ $notification->id }}')">
+                        تمييز كمقروء
+                    </button>
+                @endif
+            </div>
+        @empty
+            <div class="px-4 py-3 text-gray-500 text-center">
+                لا توجد إشعارات
+            </div>
+        @endforelse
+
+        @if(auth()->user()->notifications()->count() > 10)
+            <div class="px-4 py-2 text-center">
+                <a href="#" class="text-blue-600 text-sm">عرض جميع الإشعارات</a>
+            </div>
+        @endif
+    </div>
+</div>
+@endif
+{{-- ddd --}}
+
             </div>
 
 
@@ -63,9 +113,9 @@
                 </x-slot>
 
                 <x-slot name="content">
-                    <x-dropdown-link :href="route('profile.edit')">
+                    {{-- <x-dropdown-link :href="route('profile.edit')">
                         {{ __('الملف الشخصي') }}
-                    </x-dropdown-link>
+                    </x-dropdown-link> --}}
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
@@ -74,8 +124,10 @@
                         <x-dropdown-link :href="route('logout')"
                             onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                            {{ __('تسجيل الخروج') }}
+                            {{ __('تسجيل الدخول') }}
                         </x-dropdown-link>
+
+
                     </form>
                 </x-slot>
             </x-dropdown>
@@ -128,3 +180,25 @@
         </div>
     </div>
 </nav>
+
+
+
+
+<script>
+function markAsRead(notificationId) {
+    fetch(`/notifications/${notificationId}/mark-as-read`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>

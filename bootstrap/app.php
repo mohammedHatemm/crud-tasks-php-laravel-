@@ -19,6 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->command('news:create-random')->everyFourMinutes();
+        $schedule->command('news:create-random')->everyMinute();
     })
     ->create();

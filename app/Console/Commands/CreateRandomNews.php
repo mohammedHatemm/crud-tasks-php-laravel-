@@ -8,6 +8,8 @@ use App\Models\Category;
 use Illuminate\Console\Command;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\NewsNotification; // ←
+use Illuminate\Support\Facades\Notification; // ←
 
 class CreateRandomNews extends Command
 {
@@ -36,6 +38,8 @@ class CreateRandomNews extends Command
             ]);
 
             $news->categories()->attach($categories->pluck('id')->toArray());
+            $admins = User::where('role', 'admin')->get();
+            Notification::send($admins, new NewsNotification($news));
 
             Log::info("News created: {$news->name}");
             return Command::SUCCESS;

@@ -6,6 +6,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CategoryController;
 use App\Models\Category;
 use App\Models\News;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/', [NewsController::class, 'home'])->name('news.home');
 

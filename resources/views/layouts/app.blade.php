@@ -18,6 +18,12 @@
     <link href="{{ asset('css/news-filter.css') }}" rel="stylesheet">
     <!-- Custom Scripts -->
     <script src="{{ asset('js/news-filter.js') }}"></script>
+
+    <!-- @auth
+<script>
+    window.userId = {{ auth()->id() }};
+</script>
+@endauth -->
 </head>
 
 <body class="font-sans antialiased" dir="rtl">

@@ -1,6 +1,7 @@
 import "./bootstrap";
 
 import Alpine from "alpinejs";
+import "./news-filter";
 
 window.Alpine = Alpine;
 

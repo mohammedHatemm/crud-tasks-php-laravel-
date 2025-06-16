@@ -10,7 +10,7 @@
         <path d="M12 10v6" />
         <path d="M9 13h6" />
       </svg>
-      <a href="{{ route('news.home', ['category' => $category->id]) }}" class="flex-1">
+      <a href="{{ route('news.home', ['category' => $category->id]) }}" class="flex-1" data-category-id="{{ $category->id }}">
         {{ $category->name }}
       </a>
       <!-- سهم التوسع -->

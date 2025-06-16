@@ -145,12 +145,10 @@
                         </div>
                         @endif
 
-                        <!-- News Grid -->
                         <div id="news-container">
                             @include('partials.news_items')
                         </div>
 
-                        <!-- Pagination -->
                         <div class="mt-6">
                             {{ $news->appends(request()->query())->links() }}
                         </div>
@@ -164,17 +162,14 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/news-filter.js') }}"></script>
-<!-- إضافة الـ JavaScript في نهاية الصفحة أو في ملف منفصل -->
+{{-- <script src="{{ asset('js/news-filter.js') }}"></script> --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // العثور على جميع أزرار التوسع
         const toggleButtons = document.querySelectorAll('.toggle-category');
 
         toggleButtons.forEach(button => {
             button.addEventListener('click', function(e) {
-                // منع الانتقال إلى الرابط عند الضغط على السهم
-                // تأكد من أن النقر كان على الزر نفسه أو أيقونة الفولدر/السهم وليس على رابط اسم التصنيف
+
                 if (!e.target.closest('a')) {
                     e.preventDefault();
 
@@ -183,10 +178,8 @@
                     const folderIcons = this.querySelectorAll('.folder-icon');
 
                     if (childrenContainer) {
-                        // تبديل حالة الإظهار/الإخفاء
                         childrenContainer.classList.toggle('open');
 
-                        // تدوير أيقونة السهم
                         folderIcons.forEach(icon => {
                             icon.classList.toggle('open');
                         });

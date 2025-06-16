@@ -21,7 +21,7 @@
     <!-- Custom Styles -->
     <link href="{{ asset('css/news-filter.css') }}" rel="stylesheet">
     <!-- Custom Scripts -->
-    <script src="{{ asset('js/news-filter.js') }}"></script>
+    <!-- <script src="{{ asset('js/news-filter.js') }}"></script> -->
 
     <!-- @auth
 <script>

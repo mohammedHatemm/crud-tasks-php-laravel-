@@ -8,7 +8,6 @@ window.Alpine = Alpine;
 Alpine.start();
 
 document.addEventListener("DOMContentLoaded", function () {
-    // تفعيل زر التبديل للتصنيفات
     document.querySelectorAll(".toggle-children").forEach((button) => {
         button.addEventListener("click", function () {
             const categoryId = this.dataset.categoryId;
@@ -34,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // إضافة تأثير عند تحديد التصنيف
     document
         .querySelectorAll('input[name="categories[]"]')
         .forEach((checkbox) => {
@@ -48,22 +46,20 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-    // إضافة زر لتوسيع/طي جميع التصنيفات
     const categoriesSection =
         document.querySelector(".category-list").parentElement;
     const controlsDiv = document.createElement("div");
     controlsDiv.className = "flex justify-end mb-2";
     controlsDiv.innerHTML = `
-        <button type="button" id="expand-all" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-l">
+        <button type="button" id="expand-all" class="text-xs bg-white-200 hover:bg-white-300 text-gray-800 font-semibold py-1 px-2 rounded-l">
             توسيع الكل
         </button>
-        <button type="button" id="collapse-all" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-r border-l border-gray-300">
+        <button type="button" id="collapse-all" class="text-xs bg-white-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded-r border-l border-gray-300">
             طي الكل
         </button>
     `;
     categoriesSection.prepend(controlsDiv);
 
-    // تفعيل أزرار التوسيع/الطي
     document
         .getElementById("expand-all")
         .addEventListener("click", function () {

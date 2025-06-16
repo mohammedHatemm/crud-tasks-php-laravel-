@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 /* تحسين مظهر قائمة التصنيفات */
+
+[x-cloak] {
+    display: none !important;
+}
 .category-list {
     padding: 0;
     max-height: 400px;

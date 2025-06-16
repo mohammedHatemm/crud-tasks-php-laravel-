@@ -28,14 +28,13 @@
                 </div>
                 {{-- dddd --}}
                 @if (Auth::check())
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center my-5 py-1 px-1 rounded-md hover:bg-gray-100">
+                <div class="relative" x-data="{ openNotifications: false }" x-init="openNotifications = false">
+                    <button @click="openNotifications = !openNotifications" class="flex items-center my-5 py-1 px-1 rounded-md hover:bg-gray-100">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
                             </path>
                         </svg>
-                        {{-- <span class="ml-1">الإشعارات</span> --}}
                         @if(auth()->user()->unreadNotifications->count() > 0)
                         <span class="bg-red-500 text-white rounded-full px-2 ml-2 text-sm">
                             {{ auth()->user()->unreadNotifications->count() }}
@@ -43,8 +42,9 @@
                         @endif
                     </button>
 
-                    <div x-show="open" @click.away="open = false"
+                    <div x-show="openNotifications" x-cloak @click.away="openNotifications = false"
                         class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 max-h-96 overflow-y-auto">
+                        <!-- محتوى الإشعارات -->
                         @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notification)
                         <div class="px-4 py-3 border-b hover:bg-gray-50 {{ $notification->read_at ? 'opacity-60' : 'bg-blue-50' }}">
                             <div class="text-sm">
@@ -94,14 +94,13 @@
                 {{-- user --}}
                 {{-- dddd --}}
                 @if (Auth::check())
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center my-5 py-1 px-1  rounded-md hover:bg-gray-100">
+                <div class="relative" x-data="{ openUserNotifications: false }" x-init="openUserNotifications = false">
+                    <button @click="openUserNotifications = !openUserNotifications" class="flex items-center my-5 py-1 px-1 rounded-md hover:bg-gray-100">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
                             </path>
                         </svg>
-                        {{-- <span class="ml-1">الإشعارات</span> --}}
                         @if(auth()->user()->unreadNotifications->count() > 0)
                         <span class="bg-red-500 text-white rounded-full px-2 ml-2 text-sm">
                             {{ auth()->user()->unreadNotifications->count() }}
@@ -109,8 +108,9 @@
                         @endif
                     </button>
 
-                    <div x-show="open" @click.away="open = false"
+                    <div x-show="openUserNotifications" x-cloak @click.away="openUserNotifications = false"
                         class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50 max-h-96 overflow-y-auto">
+                        <!-- محتوى الإشعارات -->
                         @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notification)
                         <div class="px-4 py-3 border-b hover:bg-gray-50 {{ $notification->read_at ? 'opacity-60' : 'bg-blue-50' }}">
                             <div class="text-sm">
@@ -137,6 +137,7 @@
                             <a href="#" class="text-blue-600 text-sm">عرض جميع الإشعارات</a>
                         </div>
                         @endif
+
                     </div>
                 </div>
                 @endif
